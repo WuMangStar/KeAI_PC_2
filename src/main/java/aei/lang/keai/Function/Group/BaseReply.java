@@ -1,13 +1,13 @@
-package aei.lang.keai.Function;
+package aei.lang.keai.Function.Group;
 
-import aei.lang.keai.FunctionI;
-import aei.lang.keai.Utils.QQBot;
+import aei.lang.keai.Function.FunctionI;
+import aei.lang.keai.Utils.GroupMsgUtils;
 import aei.lang.msg.Messenger;
 import aei.lang.plugin.SecPlugin;
 
 import java.sql.Connection;
 
-public class BaseReply extends QQBot implements FunctionI {
+public class BaseReply extends GroupMsgUtils implements FunctionI {
 
     @Override
     public String getName() {

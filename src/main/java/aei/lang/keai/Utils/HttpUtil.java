@@ -33,6 +33,7 @@ public class HttpUtil {
             throw new RuntimeException(e);
         }
     }
+
     public static String doGet(String url) {
         OkHttpClient okHttpClient = new OkHttpClient();
         Request request;
@@ -46,6 +47,7 @@ public class HttpUtil {
             throw new RuntimeException(e);
         }
     }
+
     public static boolean isImageUrl(String url) {
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(1, TimeUnit.SECONDS)
@@ -57,16 +59,15 @@ public class HttpUtil {
                 .head() // 使用 HEAD 请求
                 .build();
 
-        try {
-            Response response = client.newCall(request).execute();
+        try (Response response = client.newCall(request).execute()) {
             if (response.isSuccessful()) {
                 String contentType = response.header("Content-Type");
                 if (contentType != null && contentType.startsWith("image")) {
                     return true;
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
         return false;

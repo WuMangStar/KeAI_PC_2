@@ -12,7 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-public class QQBot {
+public class GroupMsgUtils {
 
     private SecPlugin api;
 
@@ -91,19 +91,6 @@ public class QQBot {
             }
         });
     }
-    protected void createCacheDirectory(String CACHE_DIR) {
-        File cacheDir = new File(CACHE_DIR);
-        if (!cacheDir.exists() && !cacheDir.mkdirs()) {
-            throw new RuntimeException("无法创建缓存目录: " + CACHE_DIR);
-        }
-    }
 
-    protected void saveByte(byte[] Bytes, File saveFile){
-        try (FileOutputStream fos = new FileOutputStream(saveFile)) {
-            fos.write(Bytes);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
 }

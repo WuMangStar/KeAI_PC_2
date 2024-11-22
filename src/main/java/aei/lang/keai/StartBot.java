@@ -1,5 +1,7 @@
 package aei.lang.keai;
 
+import aei.lang.keai.Function.FirendMsg;
+import aei.lang.keai.Function.GroupMsg;
 import aei.lang.keai.MySQL.SQLConn;
 import aei.lang.msg.Messenger;
 import aei.lang.msg.Msg;
@@ -12,7 +14,7 @@ import java.util.HashMap;
 public class StartBot implements SecPluginHandler {
     private final Connection sqlConnection;
 
-    public static HashMap<String, Integer> Sp;
+    public static HashMap<String, Integer> Sp=new HashMap<>();
 
     StartBot(){
         sqlConnection=new SQLConn().getConnection();
@@ -36,10 +38,12 @@ public class StartBot implements SecPluginHandler {
 
     @Override
     public void onMsgHandler(SecPlugin api, Messenger messenger) {
-        if (messenger.hasMsg(Msg.Group)&&messenger.hasMsg(Msg.Text)) {//群聊消息
-            new GroupMsg(api, messenger,sqlConnection);
-
-
+        if (messenger.hasMsg(Msg.Text)) {//有文字的内容
+            if (messenger.hasMsg(Msg.Group)) {//群消息
+                new GroupMsg(api, messenger, sqlConnection);
+            }else if (messenger.hasMsg(Msg.Friend)){
+                new FirendMsg(api,messenger,sqlConnection);
+            }
 
         } else if (messenger.hasMsg(Msg.System)) {//系统消息
             if (messenger.hasMsg(Msg.GroupNotify)) {//群通知

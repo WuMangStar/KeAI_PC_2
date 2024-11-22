@@ -34,7 +34,7 @@ public class ContextAI {
         this.Context = ps.executeQuery();
     }
 
-    public String showTable(ResultSet rt) throws SQLException {
+    public String showTable(ResultSet rt) {
         StringBuilder sb = new StringBuilder();
         try {
             if (rt != null) {
@@ -83,7 +83,7 @@ public class ContextAI {
         ps.executeUpdate();
     }
 
-    public void setImgList(List<String> imgList) throws SQLException {
+    public void setImgList(List<String> imgList) {
         this.imgList = imgList;
     }
 
@@ -119,7 +119,7 @@ public class ContextAI {
     }
 
 
-    public JSONArray getContext() throws SQLException {
+    public JSONArray getContext() {
         JSONArray context = new JSONArray();
         JSONObject jsonTips = new JSONObject();
         jsonTips.put("content", Tips);

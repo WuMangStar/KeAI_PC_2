@@ -1,7 +1,8 @@
-package aei.lang.keai;
+package aei.lang.keai.Function;
 
-import aei.lang.keai.Function.BaseReply;
-import aei.lang.keai.Function.ChatAI;
+import aei.lang.keai.Function.Group.ArtAI;
+import aei.lang.keai.Function.Group.BaseReply;
+import aei.lang.keai.Function.Group.ChatAI;
 import aei.lang.msg.Messenger;
 import aei.lang.msg.Msg;
 import aei.lang.plugin.SecPlugin;
@@ -12,11 +13,12 @@ import java.util.List;
 
 
 public class GroupMsg {
-    GroupMsg(SecPlugin api, Messenger messenger, Connection conn) {
+    public GroupMsg(SecPlugin api, Messenger messenger, Connection conn) {
 
         List<FunctionI> init = new ArrayList<>();
         init.add(new BaseReply());
         init.add(new ChatAI());
+        init.add(new ArtAI());
 
         for (FunctionI f : init) {
             try {

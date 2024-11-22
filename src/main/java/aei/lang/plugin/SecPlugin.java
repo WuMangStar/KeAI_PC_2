@@ -290,9 +290,7 @@ public class SecPlugin extends WebSocketClient {
             JSONObject j = new JSONObject();
             Map<String, String> map = messenger.getList().get(i);
 
-            for (Map.Entry<String, String> entry : map.entrySet()) {
-                j.put(entry.getKey(), entry.getValue());
-            }
+            j.putAll(map);
 
             a.add(j);
         }
