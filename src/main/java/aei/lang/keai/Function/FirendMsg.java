@@ -1,5 +1,6 @@
 package aei.lang.keai.Function;
 
+import aei.lang.keai.Function.Firend.BaseReply;
 import aei.lang.keai.Function.Firend.ChatAI;
 import aei.lang.msg.Messenger;
 import aei.lang.msg.Msg;
@@ -13,6 +14,7 @@ public class FirendMsg {
     public FirendMsg(SecPlugin api, Messenger messenger, Connection conn) {
         List<FunctionI> init = new ArrayList<>();
         init.add(new ChatAI());
+        init.add(new BaseReply());
 
         for (FunctionI f : init) {
             try {
@@ -21,7 +23,7 @@ public class FirendMsg {
                 api.sendMessenger(msg -> {
                     msg.addMsg(Msg.Account, messenger.getString(Msg.Account));
                     msg.addMsg(Msg.Friend);
-                    msg.addMsg(Msg.Uin);
+                    msg.addMsg(Msg.Uin,messenger.getString(Msg.Uin));
                   //  msg.addMsg(Msg.Reply, messenger.getString(Msg.MsgId));
                     msg.addMsg(Msg.Text, "错误：" + e.getMessage());
                 });

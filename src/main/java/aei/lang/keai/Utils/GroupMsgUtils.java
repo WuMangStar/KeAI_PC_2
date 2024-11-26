@@ -7,9 +7,6 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
 
 public class GroupMsgUtils {
@@ -25,11 +22,14 @@ public class GroupMsgUtils {
     protected String msgid;
 
     protected List<String> imgList;
-    protected List<String> atList;
+    protected List<String> atUinList;
+    protected List<String> atNameList;
+    protected List<String> textList;
 
     protected void QQBotInit(SecPlugin api, Messenger messenger) {
         this.api = api;
-        textmsg = messenger.getString(Msg.Text);
+
+        textmsg =messenger.getString(Msg.Text);
         groupid = messenger.getString(Msg.GroupId);
         uinName = messenger.getString(Msg.UinName);
         atName = messenger.getString(Msg.AtName);
@@ -38,25 +38,73 @@ public class GroupMsgUtils {
         msgid = messenger.getString(Msg.MsgId);
 
         imgList = messenger.getList(Msg.Url);
-        atList = messenger.getList(Msg.AtUin);
+        atUinList = messenger.getList(Msg.AtUin);
+        atNameList = messenger.getList(Msg.AtName);
+        textList=messenger.getList(Msg.Text);
     }
 
     protected void send(String text) {
-        api.sendMessenger(msg -> {
+       Messenger msgGroup=api.sendMessenger(msg -> {
             msg.addMsg(Msg.Account, botUin);
             msg.addMsg(Msg.Group);
             msg.addMsg(Msg.GroupId, groupid);
             msg.addMsg(Msg.Reply, msgid);
             msg.addMsg(Msg.Text, text);
+            if (text.length() > 500) {
+                msg.addMsg(Msg.MultiMsgPut);
+                msg.addMsg(Msg.Uin, uin);
+                msg.addMsg(Msg.UinName, uinName);
+            }
         });
+        if (text.length() > 500) {
+            final Messenger rsp = api.sendMessenger(rsp1 -> {
+                rsp1.addMsg(Msg.Account, botUin);
+                rsp1.addMsg(Msg.Group);//声明 聊天记录 来源是 群聊
+                rsp1.addMsg(Msg.GroupId, groupid);
+                rsp1.addMsg(Msg.Time, System.currentTimeMillis() / 1000);//时间戳秒
+                rsp1.addMsg(Msg.MultiMsg, msgGroup.getString(Msg.MsgId));//添加消息元素
+            });//构建 聊天记录
+            api.sendMessenger(msg -> {
+                msg.addMsg(Msg.Account, botUin);
+                msg.addMsg(Msg.Group);
+                msg.addMsg(Msg.GroupId, groupid);
+                if (rsp.hasMsg(Msg.Id)) {
+                    msg.addMsg(Msg.Xml, "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>");
+                    msg.addMsg(Msg.Xml, "<msg serviceID=\"35\" templateID=\"1\" action=\"viewMultiMsg\" brief=\"KeAI 折叠消息\" m_resid=\"", rsp.getString(Msg.Id), "\" m_fileName=\"", rsp.getString(Msg.Name), "\" tSum=\"2\" sourceMsgId=\"0\" url=\"\" flag=\"3\" adverSign=\"0\" multiMsgFlag=\"0\">");
+                    msg.addMsg(Msg.Xml, "<item layout=\"1\" advertiser_id=\"0\" aid=\"0\">");
+                    msg.addMsg(Msg.Xml, "<title size=\"34\" maxLines=\"2\" lineSpace=\"12\">@" + uinName + " 请点进查看</title>");
+                    msg.addMsg(Msg.Xml, "<title size=\"26\" color=\"#FF6151\" maxLines=\"2\" lineSpace=\"12\">"+text.split("\n")[0]+"</title>");
+                    msg.addMsg(Msg.Xml, "<hr hidden=\"false\" style=\"0\" />");
+                    msg.addMsg(Msg.Xml, "<summary size=\"26\" color=\"#1F9389\">KeAI 折叠消息</summary>");
+                    msg.addMsg(Msg.Xml, "</item>");
+                    msg.addMsg(Msg.Xml, "<source name=\"聊天记录\" icon=\"\" action=\"\" appid=\"-1\" />");
+                    msg.addMsg(Msg.Xml, "</msg>");
+                } else {
+                    msg.addMsg(Msg.Text, "合成失败");
+                }
+            });
+        }
     }
 
     protected boolean coverAt(String atUin) {
-        for (String at : atList) {
-            return at.equals(atUin);
+        for (String at : atUinList) {
+            if (at.equals(atUin)) return true;
         }
         return false;
     }
+    protected String textNoAt() {
+        StringBuilder text = new StringBuilder();
+        for (String at : textList) {
+            boolean tag=true;
+            for (String atN : atNameList) {
+                if (at.equals("@" + atN)) tag = false;
+            }
+            if (tag) text.append(at);
+        }
+        return text.toString();
+    }
+
+
     public void sendImg( String url) {
         api.sendMessenger(msg -> {
             msg.addMsg(Msg.Account, botUin);

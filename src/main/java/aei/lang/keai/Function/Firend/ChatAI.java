@@ -31,8 +31,8 @@ public class ChatAI extends FirendMsgUtils implements FunctionI {
         api.sendMessenger(msg -> {
             msg.addMsg(Msg.Account, botUin);
             msg.addMsg(Msg.Friend);
-            msg.addMsg(Msg.Uin);
-            msg.addMsg(Msg.Reply, msgid);
+            msg.addMsg(Msg.Reply,msgid);
+            msg.addMsg(Msg.Uin,uin);
             for (int i = 0; i < lines.length; i++) {
                 String line = lines[i];
                 if (line.matches(".*\\(https://spc\\.unk/.+\\).*")) {

@@ -38,8 +38,8 @@ public class FirendMsgUtils {
         api.sendMessenger(msg -> {
             msg.addMsg(Msg.Account, botUin);
             msg.addMsg(Msg.Friend);
-            msg.addMsg(Msg.Uin);
-            msg.addMsg(Msg.Reply, msgid);
+            msg.addMsg(Msg.Reply,msgid);
+            msg.addMsg(Msg.Uin,uin);
             msg.addMsg(Msg.Text, text);
         });
     }
@@ -47,8 +47,8 @@ public class FirendMsgUtils {
         api.sendMessenger(msg -> {
             msg.addMsg(Msg.Account, botUin);
             msg.addMsg(Msg.Friend);
-            msg.addMsg(Msg.Uin);
-            msg.addMsg(Msg.Reply, msgid);
+            msg.addMsg(Msg.Reply,msgid);
+            msg.addMsg(Msg.Uin,uin);
             msg.addMsg(Msg.Img, url);
         });
     }
@@ -60,7 +60,8 @@ public class FirendMsgUtils {
         api.sendMessenger(msg -> {
             msg.addMsg(Msg.Account, botUin);
             msg.addMsg(Msg.Friend);
-            msg.addMsg(Msg.Uin);
+            msg.addMsg(Msg.Uin,uin);
+            msg.addMsg(Msg.Reply,msgid);
             if (!rsp.isEmpty()) {
                 msg.addMsg(Msg.Xml, "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>");
                 msg.addMsg(Msg.Xml, "<msg serviceID=\"35\" templateID=\"1\" action=\"viewMultiMsg\" brief=\"KeAI 折叠消息\" m_resid=\"", rsp, "\" m_fileName=\"2910\" tSum=\"2\" sourceMsgId=\"0\" url=\"\" flag=\"3\" adverSign=\"0\" multiMsgFlag=\"0\">");

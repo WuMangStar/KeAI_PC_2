@@ -26,17 +26,16 @@ import java.util.Base64;
 import aei.lang.keai.Utils.FileUtils;
 
 public class ArtAIAPI {
-    private final String HOST = "appinference-distribute2.thirteenleafclover.com";
 
-        private final String apiKey = "o0B/jYI8VPKcvI77gvZNPQlCggd7/EwFN+oLArHsFKDvAwswCBBLAg1Y1QcK39yTpj25igwcc72Z4Rcmp9U2NcBjKHpJdHndMizApiZ/WPzz/8CclAt9yO3FuvGg1IlDmA6pPvrSkMoCkk0c6Ym67jUAG2DnkCfiVtHD5AbP75M=";
+    private final String apiKey = "o0B/jYI8VPKcvI77gvZNPQlCggd7/EwFN+oLArHsFKDvAwswCBBLAg1Y1QcK39yTpj25igwcc72Z4Rcmp9U2NcBjKHpJdHndMizApiZ/WPzz/8CclAt9yO3FuvGg1IlDmA6pPvrSkMoCkk0c6Ym67jUAG2DnkCfiVtHD5AbP75M=";
         private final String deviceId = "8517b8c1-e8ec-4030-a04c-21d2f4e13602";
-        private final String password = "2423//dGhpcyBzZWNyZXQgaXMgdXNlIGJ5IGFuZHJvaWQga2V5IGRlY3J5cHQuNzVhQzJNNWZlNXk0FC//.NWY4MTQ0NDJjODI2NDJhMWJiYTVlOGZhMjAyYjlmM2YxNjg4NzI0MDEzNzA5FC//.C2N5M5U7761";
-        private final String salt = "this secret is use by android key decrypt.";
-        private final int iter = 4096;
+    private final int iter = 4096;
         private final int keyLength = 32;
         private final byte[] passwordDecryptionKey;
 
         public ArtAIAPI() throws GeneralSecurityException {
+            String salt = "this secret is use by android key decrypt.";
+            String password = "2423//dGhpcyBzZWNyZXQgaXMgdXNlIGJ5IGFuZHJvaWQga2V5IGRlY3J5cHQuNzVhQzJNNWZlNXk0FC//.NWY4MTQ0NDJjODI2NDJhMWJiYTVlOGZhMjAyYjlmM2YxNjg4NzI0MDEzNzA5FC//.C2N5M5U7761";
             passwordDecryptionKey = pbkdf2(password.getBytes(StandardCharsets.UTF_8), salt.getBytes(StandardCharsets.UTF_8), iter, keyLength);
             Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
         }
@@ -101,23 +100,19 @@ public class ArtAIAPI {
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("data", nEncryptServerRequest(data))  // 添加第一个文本字段
                 .build();
+        String HOST = "appinference-distribute2.thirteenleafclover.com";
         Request request = new Request.Builder()
                 .url("https://" + HOST + "/api/aigc/2.0/" + task)  // 替换为你的请求URL
                 .addHeader("CLIENTID", "UNIDREAM.a.45307e0ba846bb0ae4bf06329f7c7669")
-                //.addHeader("CLIENTVERSION","3.8.3")
                 .addHeader("DEVICEID",deviceId)
-                // .addHeader("ACCESSTOKEN","Ltaror4rLla6ZlrtmooraEZ4rAlrLR6BZLLBW6rt4bBLuo6arvrrBZmaL6mWtmERoZLokEbBo6mkobZ6L6LLRb4rLkZ6uoBvkklltEBbAmmLLLuEBrm6BLtAkrmorbLbFC//.4Hezk1HnJmg9a84Np03YD1M16FC//.oFC//.p")
-                // .addHeader("LOCALE","CN")
-                // .addHeader("TIMESTAMP","1728656212685")
-                // .addHeader("DEVICEMODEL","PHB110")
-                // .addHeader("PLATFORM","2")
-                // .addHeader("SIGNATURE","4e2b1e8293a4ffea06b86f6d0dcdf036")
                 .post(requestBody)
                 .build();
         try (Response response = client.newCall(request).execute()) {
             String body = response.body().string();
-            String DeData = nDecryptResponse(JSON.parseObject(body).getString("data") );
-            return DeData;
+            JSONObject bodyJson=JSON.parseObject(body);
+            if (!(bodyJson.getInteger("resultCode")==-220)){
+                return nDecryptResponse(bodyJson.getString("data") );
+            } throw new RuntimeException(bodyJson.getString("msg"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

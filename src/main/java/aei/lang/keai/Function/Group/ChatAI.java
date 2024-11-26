@@ -60,21 +60,33 @@ public class ChatAI extends GroupMsgUtils implements FunctionI {
         if (uin.equals("2168044167")) return;
         switch (textmsg) {
             case "记忆":
-                ContextAI mess = new ContextAI(conn, msgid, groupid);
+                ContextAI mess = new ContextAI(conn, msgid, Sp.containsKey(uin)?uin:groupid);
                 mess.delContext();
                 send("本群的聊天记录已经清理完成");
                 return;
+            case "聊天模型":
+                send("使用.开头或@开始聊天\n\n" +
+                        "设置  查询当前模型设置\n" +
+                        "模型  聊天模型进行切换\n" +
+                        "风格  模型绘画风格切换\n" +
+                        "尺寸  模型绘画尺寸切换\n" +
+                        "记忆  清除模型的上下文\n" +
+                        "私有  切换上下文为独占\n" +
+                        "公有  切换上下文群公共\n" +
+                        "提示[提示词] 更改模型提示词");
+                return;
             case "设置":
-
-                SettingAI sett = new SettingAI(conn, groupid);
-                send("智能体:" + sett.getModel() +
+                String keyId=Sp.containsKey(uin)?uin:groupid;
+                SettingAI sett = new SettingAI(conn, keyId);
+                send((uin.equals(keyId)?"个人私有":"本群公有")+"设置" +
+                        "\n智能体:" + sett.getModel() +
                         "\n绘画风格:" + sett.getArt() +
                         "\n绘图尺寸:" + sett.getSize() +
                         "\n提示词:" + sett.getTips()
                 );
                 return;
             case "模型":
-                Sp.put("Setting", CHAT_MOD_FLAG);
+                Sp.put(Sp.containsKey(uin)?uin:groupid, CHAT_MOD_FLAG);
                 StringBuilder msg1 = new StringBuilder();
                 msg1.append("智能体模型列表:").append("\n");
                 for (int i = 0; i < CHAT_MOD_EN.length; i++) {
@@ -84,7 +96,7 @@ public class ChatAI extends GroupMsgUtils implements FunctionI {
                 send(msg1.toString());
                 return;
             case "风格":
-                Sp.put("Setting", ART_MOD_FLAG);
+                Sp.put(Sp.containsKey(uin)?uin:groupid, ART_MOD_FLAG);
                 StringBuilder msg2 = new StringBuilder();
                 msg2.append("绘画风格列表:").append("\n");
                 for (int i = 0; i < ART_MOD_ZH.length; i++) {
@@ -93,8 +105,24 @@ public class ChatAI extends GroupMsgUtils implements FunctionI {
                 msg2.append("\n").append("输入序号选择");
                 send(msg2.toString());
                 return;
+            case "私有":
+                if (Sp.containsKey(uin)) {
+                    send("当前聊天模式为私有，无需切换");
+                }else {
+                    Sp.put(uin,1);
+                    send("当前模式以切换为私有模式");
+                }
+                return;
+            case "公有":
+                if (!Sp.containsKey(uin)) {
+                    send("当前聊天模式为公有，无需切换");
+                }else {
+                    Sp.remove(uin);
+                    send("当前模式以切换为公有模式");
+                }
+                return;
             case "尺寸":
-                Sp.put("Setting", ART_SIZE_FLAG);
+                Sp.put(Sp.containsKey(uin)?uin:groupid, ART_SIZE_FLAG);
                 StringBuilder msg3 = new StringBuilder();
                 msg3.append("绘图格式列表:").append("\n");
                 for (int i = 0; i < ART_SIZE.length; i++) {
@@ -106,7 +134,7 @@ public class ChatAI extends GroupMsgUtils implements FunctionI {
         }
         if (textmsg.startsWith("提示")) {
             String text = textmsg.substring(2);
-            SettingAI sett = new SettingAI(conn, groupid);
+            SettingAI sett = new SettingAI(conn, Sp.containsKey(uin)?uin:groupid);
             if (textmsg.trim().equals("提示")) {
                 sett.setDefaultTips();
                 send("AI提示词已恢复默认");
@@ -116,17 +144,24 @@ public class ChatAI extends GroupMsgUtils implements FunctionI {
             }
             return;
         }
-        if (textmsg.startsWith(".") || coverAt(botUin)) {
-            String text;
-            if (coverAt(botUin)) {
-                text = textmsg.replaceAll("@" + atName, "").trim();
-            } else {
-                text = textmsg.substring(1);
+        if (textmsg.startsWith(".") || coverAt(botUin)||textNoAt().trim().startsWith(".")) {
+            String trimText=textNoAt().trim().startsWith(".")?textNoAt().trim():textmsg.trim();
+            if (trimText.equals(".")|| trimText.equals("...")) return;
+            String text = "";
+            if (messenger.hasMsg(Msg.Reply)){
+                Messenger CacheMsg=api.sendMessenger(msg -> {
+                    msg.addMsg(Msg.Account, botUin);
+                    msg.addMsg(Msg.Group);
+                    msg.addMsg(Msg.GroupId, groupid);
+                    msg.addMsg(Msg.GroupMsgCacheGet,messenger.getString(Msg.Reply));
+                });
+                text += CacheMsg.hasMsg(Msg.Text)?CacheMsg.getString(Msg.Text)+"\n\n":"";
+                imgList.addAll(CacheMsg.getList(Msg.Url));
             }
+            text +=coverAt(botUin)? trimText: trimText.substring(1);
             System.out.println("User：" + text);
             ChatAIAPI ai=new ChatAIAPI();
-            String aimsg = ai.RequestAI(conn, groupid,msgid, text,imgList);
-            System.out.println("AI：" + aimsg);
+            String aimsg = ai.RequestAI(conn, Sp.containsKey(uin)?uin:groupid,msgid, text,imgList);
             String[] lines = aimsg.split("\n");
 
             Messenger msgGroup = api.sendMessenger(msg -> {
@@ -134,9 +169,12 @@ public class ChatAI extends GroupMsgUtils implements FunctionI {
                 msg.addMsg(Msg.Group);
                 msg.addMsg(Msg.GroupId, groupid);
                 msg.addMsg(Msg.Reply, msgid);
+                StringBuilder BuffStr=new StringBuilder();
                 for (int i = 0; i < lines.length; i++) {
                     String line = lines[i];
                     if (line.matches(".*\\(https://spc\\.unk/.+\\).*")) {
+                        msg.addMsg(Msg.Text,BuffStr);
+                        BuffStr.delete(0,BuffStr.length());
                         String cutstr = line.substring(line.indexOf("https://spc.unk/"), line.indexOf(")"));
                         JSONObject jsonimg = JSON.parseObject(HttpUtil.doGet("https://api.chaton.ai/storage/" + cutstr.replaceFirst("https://spc.unk/", "")));
                         msg.addMsg(Msg.Text, line.substring(0, line.indexOf("![")));
@@ -144,19 +182,20 @@ public class ChatAI extends GroupMsgUtils implements FunctionI {
                         msg.addMsg(Msg.Text, line.substring(line.indexOf(")") + 1));
                         continue;
                     }
-                    msg.addMsg(Msg.Text, line);
+                    BuffStr.append(line);
                     if (i != lines.length - 1) {
-                        msg.addMsg(Msg.Text, "\n");
+                       BuffStr.append("\n");
                     }
                 }
-                if (aimsg.length() > 250) {
+                msg.addMsg(Msg.Text, BuffStr);
+                if (aimsg.length() > 400) {
                     msg.addMsg(Msg.MultiMsgPut);
                     msg.addMsg(Msg.Uin, uin);
                     msg.addMsg(Msg.UinName, uinName);
                 }
             });
 
-            if (aimsg.length() > 250) {
+            if (aimsg.length() > 400) {
                 final Messenger rsp = api.sendMessenger(rsp1 -> {
                     rsp1.addMsg(Msg.Account, botUin);
                     rsp1.addMsg(Msg.Group);//声明 聊天记录 来源是 群聊
@@ -187,10 +226,12 @@ public class ChatAI extends GroupMsgUtils implements FunctionI {
             return;
         }
         if (textmsg.startsWith("。")) {
+            String trimText=textmsg.trim();
+            if (trimText.equals("。")|| trimText.equals("。。。")) return;
             String text = textmsg.substring(1);
             System.out.println("User：" + text);
             ChatAIAPI ai=new ChatAIAPI();
-            String aimsg = ai.RequestAI(conn, groupid,msgid, text,imgList);
+            String aimsg = ai.RequestAI(conn, Sp.containsKey(uin)?uin:groupid,msgid, text,imgList);
             System.out.println("AI：" + aimsg);
             String[] lines = aimsg.split("\n");
             StringBuilder texts = new StringBuilder();
@@ -216,15 +257,15 @@ public class ChatAI extends GroupMsgUtils implements FunctionI {
             return;
         }
         if (textmsg.matches("\\d{1,2}")) {
-            if (!Sp.containsKey("Setting")) return;
-            switch (Sp.get("Setting")) {
+            if (!Sp.containsKey(Sp.containsKey(uin)?uin:groupid)) return;
+            switch (Sp.get(Sp.containsKey(uin)?uin:groupid)) {
                 case CHAT_MOD_FLAG:
                     int i = Integer.parseInt(textmsg);
                     if (i > CHAT_MOD.length) return;
-                    Sp.remove("Setting");
+                    Sp.remove(Sp.containsKey(uin)?uin:groupid);
                     String model = CHAT_MOD[i - 1];
                     try {
-                        SettingAI sett = new SettingAI(conn, groupid);
+                        SettingAI sett = new SettingAI(conn, Sp.containsKey(uin)?uin:groupid);
                         sett.setModel(model);
                         send("智能体模型已切换为：" + model);
                     } catch (
@@ -235,11 +276,11 @@ public class ChatAI extends GroupMsgUtils implements FunctionI {
                 case ART_MOD_FLAG:
                     int i2 = Integer.parseInt(textmsg);
                     if (i2 > ART_MOD.length) return;
-                    Sp.remove("Setting");
+                    Sp.remove(Sp.containsKey(uin)?uin:groupid);
 
                     String artStyle = ART_MOD[i2 - 1];
                     try {
-                        SettingAI sett = new SettingAI(conn, groupid);
+                        SettingAI sett = new SettingAI(conn, Sp.containsKey(uin)?uin:groupid);
                         sett.setArt(artStyle);
 
                         send("绘画风格已切换为：" + ART_MOD_ZH[i2 - 1]);
@@ -251,11 +292,11 @@ public class ChatAI extends GroupMsgUtils implements FunctionI {
                     int i3 = Integer.parseInt(textmsg);
                     if (i3 > ART_SIZE.length) return;
                     System.out.println(textmsg);
-                    Sp.remove("Setting");
+                    Sp.remove(Sp.containsKey(uin)?uin:groupid);
 
                     String artSize = ART_SIZE[i3 - 1];
                     try {
-                        SettingAI sett = new SettingAI(conn, groupid);
+                        SettingAI sett = new SettingAI(conn, Sp.containsKey(uin)?uin:groupid);
                         sett.setSize(artSize);
 
                         send("绘画尺寸已切换为：" + artSize);

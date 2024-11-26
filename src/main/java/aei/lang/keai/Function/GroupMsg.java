@@ -15,6 +15,7 @@ import java.util.List;
 public class GroupMsg {
     public GroupMsg(SecPlugin api, Messenger messenger, Connection conn) {
 
+        if (messenger.getString(Msg.Uin).equals("2168044167"))return;
         List<FunctionI> init = new ArrayList<>();
         init.add(new BaseReply());
         init.add(new ChatAI());

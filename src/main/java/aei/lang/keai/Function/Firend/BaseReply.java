@@ -1,13 +1,14 @@
-package aei.lang.keai.Function.Group;
+package aei.lang.keai.Function.Firend;
 
 import aei.lang.keai.Function.FunctionI;
+import aei.lang.keai.Utils.FirendMsgUtils;
 import aei.lang.keai.Utils.GroupMsgUtils;
 import aei.lang.msg.Messenger;
 import aei.lang.plugin.SecPlugin;
 
 import java.sql.Connection;
 
-public class BaseReply extends GroupMsgUtils implements FunctionI {
+public class BaseReply extends FirendMsgUtils implements FunctionI {
 
     @Override
     public String getName() {
@@ -21,13 +22,6 @@ public class BaseReply extends GroupMsgUtils implements FunctionI {
             case "死了没":
                 send("我在");
                 break;
-            case "菜单":
-                send("聊天模型\n" +
-                        "绘画模型");
-                break;
-        }
-        if (textNoAt().trim().startsWith("测试")){
-            send(textNoAt());
         }
 
     }

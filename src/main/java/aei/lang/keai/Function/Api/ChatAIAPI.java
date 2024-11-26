@@ -141,6 +141,7 @@ public class ChatAIAPI {
                     JSONObject choices = dataJSON.getJSONArray("choices").getJSONObject(0);
                     String finish_reason = choices.getString("finish_reason");
                     if ("stop".equals(finish_reason) || "length".equals(finish_reason)) {
+                        System.out.println(dataJSON.getString("model")+":"+ ReplyMessages + WebMessages);
                         eventLatch.countDown();
                     }
                     JSONObject delta = choices.getJSONObject("delta");
