@@ -39,6 +39,8 @@ public class StartBot implements SecPluginHandler {
     @Override
     public void onMsgHandler(SecPlugin api, Messenger messenger) {
         if (messenger.hasMsg(Msg.Text)) {//有文字的内容
+            if (messenger.getString(Msg.Uin).equals("2168044167")) return;
+            if (!messenger.getString(Msg.Account).equals("1750383200")) return;
             if (messenger.hasMsg(Msg.Group)) {//群消息
                 new GroupMsg(api, messenger, sqlConnection);
             }else if (messenger.hasMsg(Msg.Friend)){
@@ -52,8 +54,5 @@ public class StartBot implements SecPluginHandler {
                 }
             }
         }
-    }
-    public Connection getSqlConnection() {
-        return sqlConnection;
     }
 }

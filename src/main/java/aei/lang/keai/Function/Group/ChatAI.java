@@ -12,27 +12,20 @@ import aei.lang.plugin.SecPlugin;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import kotlin.text.Charsets;
-import okhttp3.*;
-import okhttp3.internal.sse.RealEventSource;
-import okhttp3.sse.EventSource;
-import okhttp3.sse.EventSourceListener;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.scilab.forge.jlatexmath.TeXFormula;
+import org.scilab.forge.jlatexmath.TeXIcon;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
-import java.security.InvalidKeyException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Base64;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import static aei.lang.keai.StartBot.Sp;
 
@@ -57,7 +50,6 @@ public class ChatAI extends GroupMsgUtils implements FunctionI {
         final int ART_SIZE_FLAG = 3;
         final String[] ART_SIZE = {"1:1", "9:16", "16:9", "4:3"};
 
-        if (uin.equals("2168044167")) return;
         switch (textmsg) {
             case "记忆":
                 ContextAI mess = new ContextAI(conn, msgid, Sp.containsKey(uin)?uin:groupid);
@@ -144,8 +136,8 @@ public class ChatAI extends GroupMsgUtils implements FunctionI {
             }
             return;
         }
-        if (textmsg.startsWith(".") || coverAt(botUin)||textNoAt().trim().startsWith(".")) {
-            String trimText=textNoAt().trim().startsWith(".")?textNoAt().trim():textmsg.trim();
+        if (coverAt(botUin)||textNoAt().trim().startsWith(".")) {
+            String trimText=textNoAt().trim();
             if (trimText.equals(".")|| trimText.equals("...")) return;
             String text = "";
             if (messenger.hasMsg(Msg.Reply)){
@@ -188,14 +180,14 @@ public class ChatAI extends GroupMsgUtils implements FunctionI {
                     }
                 }
                 msg.addMsg(Msg.Text, BuffStr);
-                if (aimsg.length() > 400) {
+                if (aimsg.length() > 350) {
                     msg.addMsg(Msg.MultiMsgPut);
                     msg.addMsg(Msg.Uin, uin);
                     msg.addMsg(Msg.UinName, uinName);
                 }
             });
 
-            if (aimsg.length() > 400) {
+            if (aimsg.length() > 350) {
                 final Messenger rsp = api.sendMessenger(rsp1 -> {
                     rsp1.addMsg(Msg.Account, botUin);
                     rsp1.addMsg(Msg.Group);//声明 聊天记录 来源是 群聊
@@ -219,7 +211,7 @@ public class ChatAI extends GroupMsgUtils implements FunctionI {
                         msg.addMsg(Msg.Xml, "<source name=\"聊天记录\" icon=\"\" action=\"\" appid=\"-1\" />");
                         msg.addMsg(Msg.Xml, "</msg>");
                     } else {
-                        msg.addMsg(Msg.Text, "合成失败");
+                        msg.addMsg(Msg.Text, aimsg);
                     }
                 });
             }

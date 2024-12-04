@@ -94,12 +94,17 @@ public class GroupMsgUtils {
     }
     protected String textNoAt() {
         StringBuilder text = new StringBuilder();
-        for (String at : textList) {
-            boolean tag=true;
+        for (String txt : textList) {
+            boolean flag = true;
             for (String atN : atNameList) {
-                if (at.equals("@" + atN)) tag = false;
+                if (txt.equals("@"+atN)) {
+                    flag = false;
+                    break;
+                }
             }
-            if (tag) text.append(at);
+            if (flag) {
+                text.append(txt);
+            }
         }
         return text.toString();
     }

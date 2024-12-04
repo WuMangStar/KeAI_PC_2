@@ -28,13 +28,15 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class ChatAIAPI {
-    private final String version = "ChatOn_Android/1.99.430";
-    private String be() {
-        return "/Im5m39ealFF8r24GuSu7w==";
+    private final String version = "ChatOn_Android/1.56.483";
+    //
+    public String be() {
+        return "dzlqVkZVWkxuQlFRMWpYUA==";
     }
 
-    private String af(String Act, String url, String time, String json) throws InvalidKeyException, NoSuchAlgorithmException {
-        byte[] key = {14, 94, 79, 102, 38, -11, 11, 65, 100, 43, 115, 94, 15, -15, 14, 16, 66, -127, -8, -30, 98, 109, -21, 60, 62, 41, 78, 29, 72, -75, 47, 8};
+    public String af(String Act, String url, String time, String json) throws InvalidKeyException, NoSuchAlgorithmException {
+       // byte[] key = {14, 94, 79, 102, 38, -11, 11, 65, 100, 43, 115, 94, 15, -15, 14, 16, 66, -127, -8, -30, 98, 109, -21, 60, 62, 41, 78, 29, 72, -75, 47, 8};
+        byte[] key = {118, 57, 109, 118, 121, 73, 83, 76, 115, 105, 74, 51, 113, 84, 81, 85, 119, 121, 48, 121, 102, 101, 79, 69, 65, 100, 49, 69, 83, 72, 84, 77};
         byte[] value = (Act + ":" + url + ":" + time + "\n" + json).getBytes(Charsets.UTF_8);
         Mac mac;
         mac = Mac.getInstance("HmacSHA256");
