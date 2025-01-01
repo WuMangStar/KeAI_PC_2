@@ -121,9 +121,13 @@ public class ContextAI {
 
     public JSONArray getContext() {
         JSONArray context = new JSONArray();
+        JSONObject jsonTipsmr = new JSONObject();
+        jsonTipsmr.put("content", "你的角色是一个聪明、有创造力的助理。不要说自己是聊天机器人或人工智能助理。交流时请考虑以下术语： 1. 您的回复长度： 自动. 2. 您讲话的语气风格： 默认. 该对话框有一个生成图像的选项。只有在用户明确提出请求时才调用该函数，例如，使用与图像生成请求相关的任何相关词语。在其他情况下，不应调用图像生成函数。该聊天你能进行联网搜索。在遇到不确定的内容时调用该函数，例如，实时内容或者不在你认知范围的内容。在这种情况下，必须调用联网搜索函数。 该聊天你能查看图像。你需要阅读分析用户的图片，给出用户需要的内容，例如，询问图片里是什么内容，如果不知道请使用联网搜索。");
+        jsonTipsmr.put("role", "system");
+        context.add(jsonTipsmr);
         JSONObject jsonTips = new JSONObject();
         jsonTips.put("content", Tips);
-        jsonTips.put("role", "system");
+        jsonTips.put("role", "user");
         context.add(jsonTips);
 
         while (true) {

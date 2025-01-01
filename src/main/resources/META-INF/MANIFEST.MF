@@ -1,9 +1,10 @@
 Manifest-Version: 1.0
 Main-Class: aei.lang.keai.StartBot
-Class-Path: kotlin-stdlib-jdk7-1.4.10.jar mysql-connector-java-8.0.28.ja
- r kotlin-stdlib-1.4.10.jar annotations-13.0.jar bcprov-jdk15on-1.70.jar
-  okhttp-sse-4.9.3.jar okio-2.8.0.jar kotlin-stdlib-jdk8-1.4.10.jar slf4
- j-api-2.0.6.jar kotlin-stdlib-common-1.4.0.jar fastjson2-2.0.50.jar Jav
- a-WebSocket-1.5.7.jar bcpkix-jdk15on-1.70.jar bcutil-jdk15on-1.70.jar o
- khttp-4.9.3.jar protobuf-java-3.11.4.jar
+Class-Path: Java-WebSocket-1.5.7.jar annotations-13.0.jar mysql-connecto
+ r-java-8.0.28.jar protobuf-java-3.11.4.jar kotlin-stdlib-1.4.10.jar bcu
+ til-jdk15on-1.70.jar bcprov-jdk15on-1.70.jar jlatexmath-1.0.7.jar kotli
+ n-stdlib-jdk7-1.4.10.jar bcpkix-jdk15on-1.70.jar kotlin-stdlib-common-1
+ .4.0.jar jlatexmath-font-greek-1.0.7.jar okhttp-sse-4.9.3.jar kotlin-st
+ dlib-jdk8-1.4.10.jar fastjson2-2.0.50.jar slf4j-api-2.0.6.jar okhttp-4.
+ 9.3.jar jlatexmath-font-cyrillic-1.0.7.jar okio-2.8.0.jar
 

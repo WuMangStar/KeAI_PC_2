@@ -5,22 +5,25 @@
       <element id="archive" name="keai.jar">
         <element id="module-output" name="keai" />
       </element>
-      <element id="library" level="project" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.4.10" />
-      <element id="library" level="project" name="Maven: mysql:mysql-connector-java:8.0.28" />
-      <element id="library" level="project" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.4.10" />
-      <element id="library" level="project" name="Maven: org.jetbrains:annotations:13.0" />
-      <element id="library" level="project" name="Maven: org.bouncycastle:bcprov-jdk15on:1.70" />
-      <element id="library" level="project" name="Maven: com.squareup.okhttp3:okhttp-sse:4.9.3" />
-      <element id="library" level="project" name="Maven: com.squareup.okio:okio:2.8.0" />
-      <element id="library" level="project" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.10" />
-      <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:2.0.6" />
-      <element id="library" level="project" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-common:1.4.0" />
-      <element id="library" level="project" name="Maven: com.alibaba.fastjson2:fastjson2:2.0.50" />
       <element id="library" level="project" name="Maven: org.java-websocket:Java-WebSocket:1.5.7" />
-      <element id="library" level="project" name="Maven: org.bouncycastle:bcpkix-jdk15on:1.70" />
-      <element id="library" level="project" name="Maven: org.bouncycastle:bcutil-jdk15on:1.70" />
-      <element id="library" level="project" name="Maven: com.squareup.okhttp3:okhttp:4.9.3" />
+      <element id="library" level="project" name="Maven: org.jetbrains:annotations:13.0" />
+      <element id="library" level="project" name="Maven: mysql:mysql-connector-java:8.0.28" />
       <element id="library" level="project" name="Maven: com.google.protobuf:protobuf-java:3.11.4" />
+      <element id="library" level="project" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.4.10" />
+      <element id="library" level="project" name="Maven: org.bouncycastle:bcutil-jdk15on:1.70" />
+      <element id="library" level="project" name="Maven: org.bouncycastle:bcprov-jdk15on:1.70" />
+      <element id="library" level="project" name="Maven: org.scilab.forge:jlatexmath:1.0.7" />
+      <element id="library" level="project" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.4.10" />
+      <element id="library" level="project" name="Maven: org.bouncycastle:bcpkix-jdk15on:1.70" />
+      <element id="library" level="project" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-common:1.4.0" />
+      <element id="library" level="project" name="Maven: org.scilab.forge:jlatexmath-font-greek:1.0.7" />
+      <element id="library" level="project" name="Maven: com.squareup.okhttp3:okhttp-sse:4.9.3" />
+      <element id="library" level="project" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.10" />
+      <element id="library" level="project" name="Maven: com.alibaba.fastjson2:fastjson2:2.0.50" />
+      <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:2.0.6" />
+      <element id="library" level="project" name="Maven: com.squareup.okhttp3:okhttp:4.9.3" />
+      <element id="library" level="project" name="Maven: org.scilab.forge:jlatexmath-font-cyrillic:1.0.7" />
+      <element id="library" level="project" name="Maven: com.squareup.okio:okio:2.8.0" />
     </root>
   </artifact>
 </component>

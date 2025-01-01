@@ -28,7 +28,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class ChatAIAPI {
-    private final String version = "ChatOn_Android/1.56.483";
+    private final String version = "ChatOn_Android/1.58.504";
     //
     public String be() {
         return "dzlqVkZVWkxuQlFRMWpYUA==";

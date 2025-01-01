@@ -1,4 +1,4 @@
-
+use aichat;
 -- auto-generated definition
 create table aicontext
 (

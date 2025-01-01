@@ -49,7 +49,7 @@ public class ArtAI extends GroupMsgUtils implements FunctionI {
             if (trimText.equals("画")||trimText.equals("draw")||trimText.equals("画画")) return;
             String text = textmsg.startsWith("画") ? textmsg.substring(1) : textmsg.substring(4);
             ChatAIAPI AI = new ChatAIAPI();
-            if (!Sp.containsKey(groupid)) {
+            if (!groupid.equals("465267302")||Sp.containsKey(groupid)) {
                 if (!AI.easyGPT("作为提示词检测师，你的任务是审核提示词内容。请判断提示词中的内容是否包含不当内容（NSFW），例如：屁股，容易露出人物肉体的词汇，例如保鲜膜，以及不合理的内容 如四条腿。如果包含，请只返回“违规”；如果不包含，请只返回“合法”。提示词如下：" + text, "gpt-4o").startsWith("合法")) {
                     send("内容违规:NSFW");
                     return;
