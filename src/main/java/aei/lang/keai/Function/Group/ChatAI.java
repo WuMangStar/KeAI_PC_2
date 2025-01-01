@@ -52,9 +52,10 @@ public class ChatAI extends GroupMsgUtils implements FunctionI {
 
         switch (textmsg) {
             case "记忆":
-                ContextAI mess = new ContextAI(conn, msgid, Sp.containsKey(uin)?uin:groupid);
+                String keyId1=Sp.containsKey(uin)?uin:groupid;
+                ContextAI mess = new ContextAI(conn, msgid,keyId1);
                 mess.delContext();
-                send("本群的聊天记录已经清理完成");
+                send((uin.equals(keyId1)?"个人私有":"本群公有")+"聊天记录已经清理完成");
                 return;
             case "聊天模型":
                 send("使用.开头或@开始聊天\n\n" +

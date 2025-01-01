@@ -2,6 +2,7 @@ package aei.lang.keai.Function.Firend;
 
 import aei.lang.keai.Function.Api.ChatAIAPI;
 import aei.lang.keai.Function.FunctionI;
+import aei.lang.keai.MySQL.ContextAI;
 import aei.lang.keai.Utils.FirendMsgUtils;
 import aei.lang.keai.Utils.HttpUtil;
 import aei.lang.msg.Messenger;
@@ -13,6 +14,8 @@ import kotlin.Function;
 
 import java.sql.Connection;
 
+import static aei.lang.keai.StartBot.Sp;
+
 
 public class ChatAI extends FirendMsgUtils implements FunctionI {
     @Override
@@ -23,6 +26,12 @@ public class ChatAI extends FirendMsgUtils implements FunctionI {
     @Override
     public void init(SecPlugin api, Messenger messenger, Connection conn) throws Exception {
         QQBotInit(api, messenger);
+        if (textmsg.equals("记忆")) {
+            ContextAI mess = new ContextAI(conn, msgid, uin);
+            mess.delContext();
+            send("聊天记录已经清理完成");
+            return;
+        }
         System.out.println("User：" + textmsg);
         ChatAIAPI ai=new ChatAIAPI();
         String aimsg = ai.RequestAI(conn, uin,msgid, textmsg,imgList);
