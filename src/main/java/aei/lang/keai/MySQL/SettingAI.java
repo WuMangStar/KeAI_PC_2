@@ -174,8 +174,6 @@ public class SettingAI {
             answer the above question with Y or N at each output.
             </rules>
            """;
-    private String Art="photographic";
-    private String Size="1:1";
 
     public SettingAI(Connection conn, String groupId) throws SQLException {
         this.conn = conn;
@@ -185,21 +183,17 @@ public class SettingAI {
         ps.setString(1, groupId);
         ResultSet Setting = ps.executeQuery();
         if (!Setting.next()) {
-            String sqlinst = "insert into aisetting values(?,?,?,?,?)";
+            String sqlinst = "insert into aisetting values(?,?,?)";
             PreparedStatement psinst = conn.prepareStatement(sqlinst);
             psinst.setString(1, groupId);
             psinst.setString(2, this.Model);
             psinst.setString(3, Tips_default);
-            psinst.setString(4, this.Art);
-            psinst.setString(5, this.Size);
             psinst.executeUpdate();
             Tips=Tips_default;
             return;
         }
             Model=Setting.getString("Model");
             Tips=Setting.getString("Tips");
-            Art=Setting.getString("Art");
-            Size=Setting.getString("Size");
     }
 
     public String getModel() {
@@ -209,9 +203,6 @@ public class SettingAI {
     public String getTips() {
         return Tips;
     }
-
-    public String getArt() {return this.Art;}
-    public String getSize() {return this.Size;}
 
     public void setModel(String model) throws SQLException {
         String sql = "update aisetting set Model = ? where GroupId = ?";
@@ -232,21 +223,6 @@ public class SettingAI {
         String sql = "update aisetting set Tips = ? where GroupId = ?";
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, Tips_default);
-        ps.setString(2, groupId);
-        ps.executeUpdate();
-    }
-
-    public void setArt(String art) throws SQLException{
-        String sql = "update aisetting set Art = ? where GroupId = ?";
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setString(1, art);
-        ps.setString(2, groupId);
-        ps.executeUpdate();
-    }
-    public void setSize(String size) throws SQLException{
-        String sql = "update aisetting set Size = ? where GroupId = ?";
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setString(1, size);
         ps.setString(2, groupId);
         ps.executeUpdate();
     }

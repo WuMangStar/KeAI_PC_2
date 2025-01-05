@@ -25,7 +25,7 @@ public class FirendMsg {
                     msg.addMsg(Msg.Friend);
                     msg.addMsg(Msg.Uin,messenger.getString(Msg.Uin));
                   //  msg.addMsg(Msg.Reply, messenger.getString(Msg.MsgId));
-                    msg.addMsg(Msg.Text, "错误：" + e.getMessage());
+                    msg.addMsg(Msg.Text, f.getName() + "错误：" + e.getMessage());
                 });
                 api.printE(f.getName() + " 错误：" + e.getMessage());
             }

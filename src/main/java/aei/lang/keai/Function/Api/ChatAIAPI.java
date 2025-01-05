@@ -99,8 +99,6 @@ public class ChatAIAPI {
         JSONObject json = new JSONObject();
         json.put("function_image_gen", true);
         json.put("function_web_search", true);
-        json.put("image_aspect_ratio", sett.getSize());
-        json.put("image_style", sett.getArt());
         json.put("max_tokens", 8000);
         json.put("messages", mess.getContext());
         json.put("model", sett.getModel());

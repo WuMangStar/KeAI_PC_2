@@ -28,19 +28,14 @@ public class BaseReply extends GroupMsgUtils implements FunctionI {
         switch (textmsg) {
             case "死了没":
                 send("我在");
-                break;
+                return;
             case "菜单":
+            case "功能":
                 send("聊天模型\n" +
-                        "绘画模型");
-                break;
+                        "绘画模型\n" +
+                        "我的世界");
+                return;
         }
-       if (textmsg.matches("鉴权.*~.*")){
-          String text=textmsg.replaceFirst("鉴权","");
-           ChatAIAPI ai=new ChatAIAPI();
-           String time=text.substring(0,text.indexOf("~"));
-           String date=text.substring(text.indexOf("~")+1);
-           send("Bearer " + ai.be() + "." + ai.af("POST", "/chats/stream", time, date));
-       }
 
     }
 

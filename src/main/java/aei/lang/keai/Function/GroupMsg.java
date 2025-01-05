@@ -29,7 +29,7 @@ public class GroupMsg {
                     msg.addMsg(Msg.Group);
                     msg.addMsg(Msg.GroupId, messenger.getString(Msg.GroupId));
                     msg.addMsg(Msg.Reply, messenger.getString(Msg.MsgId));
-                    msg.addMsg(Msg.Text, "错误：" + e.getMessage());
+                    msg.addMsg(Msg.Text, f.getName() + "错误：" + e.getMessage());
                 });
                 api.printE(f.getName() + " 错误：" + e.getMessage());
             }

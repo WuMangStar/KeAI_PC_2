@@ -14,7 +14,6 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -23,111 +22,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
- class MinecraftServerPing {
-    private static final int TIMEOUT = 5000; // 设置超时时间为5000毫秒
-    private final String serverAddress;
-    private final int port;
-
-    public MinecraftServerPing(String serverAddress, int port) {
-        this.serverAddress = serverAddress;
-        this.port = port;
-    }
-
-    public String getServerStatus() throws IOException {
-        Socket socket = new Socket();
-        // 设置连接超时
-        socket.connect(new InetSocketAddress(serverAddress, port), TIMEOUT);
-
-        // 创建输出流
-        DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-        DataInputStream in = new DataInputStream(socket.getInputStream());
-
-        // 创建握手包
-        ByteArrayOutputStream handshake = new ByteArrayOutputStream();
-        DataOutputStream handshakeData = new DataOutputStream(handshake);
-        handshakeData.writeByte(0x00); // 握手包ID
-        writeVarInt(handshakeData, 763); // 协议版本（763用于MC 1.20.1）
-        writeString(handshakeData, serverAddress, StandardCharsets.UTF_8); // 服务器地址
-        handshakeData.writeShort(port); // 服务器端口
-        writeVarInt(handshakeData, 1); // 下一个状态（1表示状态）
-
-        // 发送握手包
-        byte[] handshakePacket = createPacket(handshake.toByteArray());
-        out.write(handshakePacket);
-
-        // 发送状态请求包
-        ByteArrayOutputStream request = new ByteArrayOutputStream();
-        DataOutputStream requestData = new DataOutputStream(request);
-        requestData.writeByte(0x00); // 状态请求包ID
-        byte[] requestPacket = createPacket(request.toByteArray());
-        out.write(requestPacket);
-
-        // 读取响应
-        byte[] responseData = readPacket(in);
-        String jsonResponse = new String(responseData, StandardCharsets.UTF_8);
-
-        // 发送Ping包
-        ByteArrayOutputStream ping = new ByteArrayOutputStream();
-        DataOutputStream pingData = new DataOutputStream(ping);
-        pingData.writeByte(0x01); // Ping包ID
-        pingData.writeLong(System.currentTimeMillis());
-        byte[] pingPacket = createPacket(ping.toByteArray());
-        out.write(pingPacket);
-
-        // 读取Pong响应
-        readPacket(in);
-        socket.close();
-        return jsonResponse;
-
-    }
-
-    private byte[] createPacket(byte[] data) throws IOException {
-        ByteArrayOutputStream packet = new ByteArrayOutputStream();
-        DataOutputStream packetData = new DataOutputStream(packet);
-        writeVarInt(packetData, data.length);
-        packetData.write(data);
-        return packet.toByteArray();
-    }
-
-    private void writeVarInt(DataOutputStream out, int value) throws IOException {
-        while ((value & 0xFFFFFF80) != 0L) {
-            out.writeByte((value & 0x7F) | 0x80);
-            value >>>= 7;
-        }
-        out.writeByte(value & 0x7F);
-    }
-
-    private void writeString(DataOutputStream out, String value, java.nio.charset.Charset charset) throws IOException {
-        byte[] bytes = value.getBytes(charset);
-        writeVarInt(out, bytes.length);
-        out.write(bytes);
-    }
-
-    private byte[] readPacket(DataInputStream in) throws IOException {
-        int length = readVarInt(in);
-        byte[] data = new byte[length];
-        in.readFully(data);
-        return data;
-    }
-
-    private int readVarInt(DataInputStream in) throws IOException {
-        int numRead = 0;
-        int result = 0;
-        byte read;
-        do {
-            read = in.readByte();
-            int value = (read & 0x7F);
-            result |= (value << (7 * numRead));
-
-            numRead++;
-            if (numRead > 5) {
-                throw new RuntimeException("VarInt太大了");
-            }
-        } while ((read & 0x80) != 0);
-
-        return result;
-    }
-}
+import static aei.lang.keai.StartBot.Sp;
 
 
 public class MCRank {
@@ -145,7 +40,7 @@ public class MCRank {
             try {
                 MinecraftServerPing ping = new MinecraftServerPing("s6.yzrilyzr.top", 25565);
                 String status = ping.getServerStatus();
-                JSONObject statusJson = JSON.parseObject(status.substring(3));
+                JSONObject statusJson = JSON.parseObject(status.substring(status.indexOf("{")));
                 JSONObject players = statusJson.getJSONObject("players");
                 onlineMax = players.getIntValue("max");
                 online = players.getIntValue("online");
@@ -162,7 +57,7 @@ public class MCRank {
                         String playerName = JSON.parseObject(player).getString("name");
                         outMsg.append("\n").append(playerName).append(" 加入服务器");
                         onlineTime.put(playerName, System.currentTimeMillis());
-                        setData(playerName, 0);
+                        addTime(playerName, 0);
                     }
                 }
                 Set<String> playersOld = new HashSet<>(setB);
@@ -172,7 +67,7 @@ public class MCRank {
                         String playerName = JSON.parseObject(player).getString("name");
                         long onlineEnd = (System.currentTimeMillis() - onlineTime.get(playerName));
                         outMsg.append("\n").append(playerName).append(" 退出服务器 在线：").append(msToTime(onlineEnd));
-                        setData(playerName, onlineEnd);
+                        addTime(playerName, onlineEnd);
                         onlineTime.remove(playerName);
                     }
                 }
@@ -189,18 +84,13 @@ public class MCRank {
                 setB.clear();
                 setB.addAll(setA);
             } catch (Exception e) {
-                try {
-                    System.out.println("无法链接到服务器，30s后重试 Time:" + LocalDateTime.now());
-                    Thread.sleep(30000);
-                } catch (InterruptedException ex) {
-                    throw new RuntimeException(ex);
-                }
+                System.out.println("无法链接到服务器");
             }
-        }, 0, 5000, TimeUnit.MILLISECONDS);
+        }, 0, 2000, TimeUnit.MILLISECONDS);
     }
 
     public String ping() {
-        if (onlineMax==0){
+        if (onlineMax == 0) {
             return "无法链接到服务器";
         }
         StringBuilder outMsg = new StringBuilder();
@@ -209,6 +99,14 @@ public class MCRank {
             outMsg.append("\n").append(key);
         }
         return outMsg.toString();
+    }
+
+    public void save() throws SQLException {
+        for (String player : onlineTime.keySet()) {
+            long onlineEnd = (System.currentTimeMillis() - onlineTime.get(player));
+            addTime(player, onlineEnd);
+            onlineTime.put(player, System.currentTimeMillis());
+        }
     }
 
     public String getRanking() throws SQLException, IOException {
@@ -241,7 +139,7 @@ public class MCRank {
         return builder.toString();
     }
 
-    public void setData(String Player, long OnlineTime) throws SQLException {
+    public void addTime(String Player, long OnlineTime) throws SQLException {
         PreparedStatement ps = conn.prepareStatement("select * from onlinetime where Player = ?");
         ps.setString(1, Player);
         ResultSet rt = ps.executeQuery();

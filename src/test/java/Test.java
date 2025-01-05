@@ -1,13 +1,42 @@
+import aei.lang.keai.Function.Api.ArtAIAPI;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
+import okhttp3.*;
+
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Base64;
+import java.security.GeneralSecurityException;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 public class Test {
-    public static void main(String[] args) {
-        byte[] xx={123, 34, 102, 117, 110, 99, 116, 105, 111, 110, 95, 105, 109, 97, 103, 101, 95, 103, 101, 110, 34, 58, 116, 114, 117, 101, 44, 34, 102, 117, 110, 99, 116, 105, 111, 110, 95, 119, 101, 98, 95, 115, 101, 97, 114, 99, 104, 34, 58, 102, 97, 108, 115, 101, 44, 34, 109, 97, 120, 95, 116, 111, 107, 101, 110, 115, 34, 58, 56, 48, 48, 48, 44, 34, 109, 101, 115, 115, 97, 103, 101, 115, 34, 58, 91, 123, 34, 99, 111, 110, 116, 101, 110, 116, 34, 58, 34, -28, -67, -96, -25, -102, -124, -24, -89, -110, -24, -119, -78, -26, -104, -81, -28, -72, -128, -28, -72, -86, -24, -127, -86, -26, -104, -114, -29, -128, -127, -26, -100, -119, -27, -120, -101, -23, -128, -96, -27, -118, -101, -25, -102, -124, -27, -118, -87, -25, -112, -122, -29, -128, -126, -28, -72, -115, -24, -90, -127, -24, -81, -76, -24, -121, -86, -27, -73, -79, -26, -104, -81, -24, -127, -118, -27, -92, -87, -26, -100, -70, -27, -103, -88, -28, -70, -70, -26, -120, -106, -28, -70, -70, -27, -73, -91, -26, -103, -70, -24, -125, -67, -27, -118, -87, -25, -112, -122, -29, -128, -126, -28, -70, -92, -26, -75, -127, -26, -105, -74, -24, -81, -73, -24, -128, -125, -24, -103, -111, -28, -69, -91, -28, -72, -117, -26, -100, -81, -24, -81, -83, -17, -68, -102, 32, 49, 46, 32, -26, -126, -88, -25, -102, -124, -27, -101, -98, -27, -92, -115, -23, -107, -65, -27, -70, -90, -17, -68, -102, 32, -24, -121, -86, -27, -118, -88, 46, 32, 50, 46, 32, -26, -126, -88, -24, -82, -78, -24, -81, -99, -25, -102, -124, -24, -81, -83, -26, -80, -108, -23, -93, -114, -26, -96, -68, -17, -68, -102, 32, -23, -69, -104, -24, -82, -92, 46, 32, -24, -81, -91, -27, -81, -71, -24, -81, -99, -26, -95, -122, -26, -100, -119, -28, -72, -128, -28, -72, -86, -25, -108, -97, -26, -120, -112, -27, -101, -66, -27, -125, -113, -25, -102, -124, -23, -128, -119, -23, -95, -71, -29, -128, -126, -27, -113, -86, -26, -100, -119, -27, -100, -88, -25, -108, -88, -26, -120, -73, -26, -104, -114, -25, -95, -82, -26, -113, -112, -27, -121, -70, -24, -81, -73, -26, -79, -126, -26, -105, -74, -26, -119, -115, -24, -80, -125, -25, -108, -88, -24, -81, -91, -27, -121, -67, -26, -107, -80, -17, -68, -116, -28, -66, -117, -27, -90, -126, -17, -68, -116, -28, -67, -65, -25, -108, -88, -28, -72, -114, -27, -101, -66, -27, -125, -113, -25, -108, -97, -26, -120, -112, -24, -81, -73, -26, -79, -126, -25, -101, -72, -27, -123, -77, -25, -102, -124, -28, -69, -69, -28, -67, -107, -25, -101, -72, -27, -123, -77, -24, -81, -115, -24, -81, -83, -29, -128, -126, -27, -100, -88, -27, -123, -74, -28, -69, -106, -26, -125, -123, -27, -122, -75, -28, -72, -117, -17, -68, -116, -28, -72, -115, -27, -70, -108, -24, -80, -125, -25, -108, -88, -27, -101, -66, -27, -125, -113, -25, -108, -97, -26, -120, -112, -27, -121, -67, -26, -107, -80, -29, -128, -126, 34, 44, 34, 114, 111, 108, 101, 34, 58, 34, 115, 121, 115, 116, 101, 109, 34, 125, 44, 123, 34, 99, 111, 110, 116, 101, 110, 116, 34, 58, 34, -24, -82, -88, -27, -114, -116, -28, -67, -96, 34, 44, 34, 114, 111, 108, 101, 34, 58, 34, 117, 115, 101, 114, 34, 125, 93, 44, 34, 109, 111, 100, 101, 108, 34, 58, 34, 103, 112, 116, 45, 52, 111, 45, 109, 105, 110, 105, 34, 44, 34, 115, 111, 117, 114, 99, 101, 34, 58, 34, 99, 104, 97, 116, 47, 102, 114, 101, 101, 34, 125};
-        byte[] key = {-65, -39, -81, -56, -124, -117, -78, 34, 119, -87, 52, 20, -61, 45, 50, 125, -29, -124, 1, -35, 68, 72, 116, -52};
-        String keyma="v9mvyISLsiJ3qTQUwy0yfeOEAd1ESHTM";
-        System.out.println(Arrays.toString(keyma.getBytes(StandardCharsets.UTF_8)));
-
+    public static void main(String[] args) throws IOException, GeneralSecurityException {
+     /*   ArtAIAPI artAIAPI = new ArtAIAPI();
+        OkHttpClient client = new OkHttpClient();
+       InputStream inputStream= ZipInputStream();
+        InputStream inputStream = new FileInputStream("artCache/gzy_textart_Unidream_1735992911522_w27n_cross.zip");
+        RequestBody fileBody = RequestBody.create(MediaType.parse("application/octet-stream"), artAIAPI.invertBytes(inputStream.readAllBytes()));
+        MultipartBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file","gzy_textart_Unidream_1735992911522_w27n_cross.png", fileBody)  // 添加第一个文本字段
+                .addFormDataPart("data", artAIAPI.nEncryptServerRequest_img("{\"subDir\":\"cn#andr\"}"))
+                .build();
+        Request request = new Request.Builder()
+                .url("https://appinference-upload4.guangzhuiyuan.com/api/aigc-oss/upload/tmp/zip/textart")  // 替换为你的请求URL
+                .addHeader("CLIENTID", "UNIDREAM.a.45307e0ba846bb0ae4bf06329f7c7669")
+                .addHeader("DEVICEID", artAIAPI.getDeviceId())
+                .post(requestBody)
+                .build();
+        try (Response response = client.newCall(request).execute()) {
+            String body = response.body().string();
+            JSONObject bodyJson = JSON.parseObject(body);
+            int resultCode = bodyJson.getInteger("resultCode");
+            if (resultCode != 100) throw new RuntimeException(bodyJson.toJSONString());
+            System.out.printf(artAIAPI.nDecryptResponse_img(bodyJson.getString("data")));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }*/
     }
 }
