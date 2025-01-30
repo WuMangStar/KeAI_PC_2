@@ -38,7 +38,7 @@ public class MCRank {
         Set<String> setB = new HashSet<>();
         service.scheduleAtFixedRate(() -> {
             try {
-                MinecraftServerPing ping = new MinecraftServerPing("s6.yzrilyzr.top", 25565);
+                MinecraftServerPing ping = new MinecraftServerPing("jsmsp.fun", 25565);
                 String status = ping.getServerStatus();
                 JSONObject statusJson = JSON.parseObject(status.substring(status.indexOf("{")));
                 JSONObject players = statusJson.getJSONObject("players");

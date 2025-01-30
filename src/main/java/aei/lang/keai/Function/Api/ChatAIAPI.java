@@ -29,13 +29,14 @@ import java.util.concurrent.TimeUnit;
 
 public class ChatAIAPI {
     private final String version = "ChatOn_Android/1.58.504";
+
     //
     public String be() {
         return "dzlqVkZVWkxuQlFRMWpYUA==";
     }
 
     public String af(String Act, String url, String time, String json) throws InvalidKeyException, NoSuchAlgorithmException {
-       // byte[] key = {14, 94, 79, 102, 38, -11, 11, 65, 100, 43, 115, 94, 15, -15, 14, 16, 66, -127, -8, -30, 98, 109, -21, 60, 62, 41, 78, 29, 72, -75, 47, 8};
+        // byte[] key = {14, 94, 79, 102, 38, -11, 11, 65, 100, 43, 115, 94, 15, -15, 14, 16, 66, -127, -8, -30, 98, 109, -21, 60, 62, 41, 78, 29, 72, -75, 47, 8};
         byte[] key = {118, 57, 109, 118, 121, 73, 83, 76, 115, 105, 74, 51, 113, 84, 81, 85, 119, 121, 48, 121, 102, 101, 79, 69, 65, 100, 49, 69, 83, 72, 84, 77};
         byte[] value = (Act + ":" + url + ":" + time + "\n" + json).getBytes(Charsets.UTF_8);
         Mac mac;
@@ -89,7 +90,8 @@ public class ChatAIAPI {
     }
 
     public String RequestAI(Connection conn, String keyId, String msgid, String text, List<String> imgList) throws Exception {
-        ContextAI mess = new ContextAI(conn, msgid, keyId);
+
+        ContextAI mess= new ContextAI(conn, msgid, keyId);
         SettingAI sett = new SettingAI(conn, keyId);
 
         mess.setUser(text);
@@ -141,7 +143,7 @@ public class ChatAIAPI {
                     JSONObject choices = dataJSON.getJSONArray("choices").getJSONObject(0);
                     String finish_reason = choices.getString("finish_reason");
                     if ("stop".equals(finish_reason) || "length".equals(finish_reason)) {
-                        System.out.println(dataJSON.getString("model")+":"+ ReplyMessages + WebMessages);
+                        System.out.println(dataJSON.getString("model") + ":" + ReplyMessages + WebMessages);
                         eventLatch.countDown();
                     }
                     JSONObject delta = choices.getJSONObject("delta");
@@ -152,7 +154,7 @@ public class ChatAIAPI {
                     JSONObject dataObj = dataJSON.getJSONObject("data");
                     if (dataObj.containsKey("web")) {
                         JSONObject web = dataObj.getJSONObject("web");
-                        if (web.containsKey("sources")) {
+                        /*if (web.containsKey("sources")) {
                             JSONArray sources = web.getJSONArray("sources");
                             WebMessages.append("\n\n").append("参考：");
                             for (Object urlSources : sources) {
@@ -160,7 +162,7 @@ public class ChatAIAPI {
                                 String url = ((JSONObject) urlSources).getString("url");
                                 WebMessages.append("\n").append(title).append(":").append(url);
                             }
-                        }
+                        }*/
                     }
                 }
             }
@@ -168,7 +170,7 @@ public class ChatAIAPI {
         realEventSource.connect(okHttpClient);
         eventLatch.await();
         mess.setAI(ReplyMessages.toString());
-        return ReplyMessages.toString()+WebMessages;
+        return ReplyMessages.toString() + WebMessages;
     }
 
     public String easyGPT(String text, String model) throws InterruptedException, NoSuchAlgorithmException, InvalidKeyException {

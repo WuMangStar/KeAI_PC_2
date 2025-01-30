@@ -1,6 +1,7 @@
 package aei.lang.keai;
 
 import aei.lang.keai.Function.Api.MCRank;
+import aei.lang.keai.Function.AuthMsg;
 import aei.lang.keai.Function.FirendMsg;
 import aei.lang.keai.Function.GroupMsg;
 import aei.lang.keai.MySQL.SQLConn;
@@ -8,7 +9,6 @@ import aei.lang.msg.Messenger;
 import aei.lang.msg.Msg;
 import aei.lang.plugin.SecPlugin;
 import aei.lang.plugin.SecPluginHandler;
-import com.sun.source.util.Plugin;
 
 import java.sql.Connection;
 import java.util.HashMap;
@@ -43,11 +43,15 @@ public class StartBot implements SecPluginHandler {
     @Override
     public void onMsgHandler(SecPlugin api, Messenger messenger) {
         if (messenger.hasMsg(Msg.Text)) {//有文字的内容
-            if (messenger.getString(Msg.Uin).equals("2168044167")) return;
-            if (messenger.hasMsg(Msg.Group)) {//群消息
-                new GroupMsg(api, messenger, sqlConnection);
-            }else if (messenger.hasMsg(Msg.Friend)){
-                new FirendMsg(api,messenger,sqlConnection);
+            if (messenger.hasMsg(Msg.AppId)){
+                new AuthMsg(api,messenger,sqlConnection);
+            }else{
+                if (messenger.getString(Msg.Uin).equals("2168044167")) return;
+                if (messenger.hasMsg(Msg.Group)) {//群消息
+                    new GroupMsg(api, messenger, sqlConnection);
+                }else if (messenger.hasMsg(Msg.Friend)){
+                    new FirendMsg(api,messenger,sqlConnection);
+                }
             }
 
         } else if (messenger.hasMsg(Msg.System)) {//系统消息
