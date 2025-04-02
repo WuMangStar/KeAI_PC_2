@@ -12,20 +12,10 @@ import aei.lang.plugin.SecPlugin;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import org.scilab.forge.jlatexmath.TeXFormula;
-import org.scilab.forge.jlatexmath.TeXIcon;
+import org.jetbrains.annotations.NotNull;
 
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
-import java.sql.SQLException;
 
 import static aei.lang.keai.StartBot.Sp;
 
@@ -41,8 +31,8 @@ public class ChatAI extends GroupMsgUtils implements FunctionI {
     public void init(SecPlugin api, Messenger messenger, Connection conn) throws Exception {
         QQBotInit(api, messenger);
         final int CHAT_MOD_FLAG = 1;
-        final String[] CHAT_MOD = {"gpt-4o", "gpt-4o-mini", "claude", "claude-3-5-sonnet"};
-        final String[] CHAT_MOD_EN = {"ChatGPT 4o", "ChatGPT 4o mini", "Claude 3 haiku", "Claude 3.5 sonnet"};
+        final String[] CHAT_MOD = {"gpt-4o", "gpt-4o-mini", "claude", "claude-3-5-sonnet", "deepseek-r1","sonar-reasoning-pro"};
+        final String[] CHAT_MOD_EN = {"ChatGPT 4o", "ChatGPT 4o mini", "Claude 3 haiku", "Claude 3.5 sonnet", "DeepSeek R1","Perplexity Sonar"};
         final String keyId = Sp.containsKey(uin) ? uin : groupid;
         switch (textmsg) {
             case "记忆":
@@ -108,17 +98,7 @@ public class ChatAI extends GroupMsgUtils implements FunctionI {
         if (coverAt(botUin) || textNoAt().trim().startsWith(".")) {
             String trimText = textNoAt().trim();
             if (trimText.equals(".") || trimText.equals("...")) return;
-            String text = "";
-            if (messenger.hasMsg(Msg.Reply)) {
-                Messenger CacheMsg = api.sendMessenger(msg -> {
-                    msg.addMsg(Msg.Account, botUin);
-                    msg.addMsg(Msg.Group);
-                    msg.addMsg(Msg.GroupId, groupid);
-                    msg.addMsg(Msg.GroupMsgCacheGet, messenger.getString(Msg.Reply));
-                });
-                text += CacheMsg.hasMsg(Msg.Text) ? CacheMsg.getString(Msg.Text) + "\n\n" : "";
-                imgList.addAll(CacheMsg.getList(Msg.Url));
-            }
+            String text = getReplyMsg(api,messenger);
             text += coverAt(botUin) ? trimText : trimText.substring(1);
             System.out.println("User：" + text);
             ChatAIAPI ai = new ChatAIAPI();
@@ -186,14 +166,14 @@ public class ChatAI extends GroupMsgUtils implements FunctionI {
             }
             return;
         }
-        if (textmsg.startsWith("。")) {
-            String trimText = textmsg.trim();
+        if (textNoAt().trim().startsWith("。")) {
+            String trimText = textNoAt().trim();
             if (trimText.equals("。") || trimText.equals("。。。")) return;
-            String text = textmsg.substring(1);
+            String text = getReplyMsg(api, messenger);
+            text += coverAt(botUin) ? trimText : trimText.substring(1);
             System.out.println("User：" + text);
             ChatAIAPI ai = new ChatAIAPI();
             String aimsg = ai.RequestAI(conn, keyId, msgid, text, imgList);
-            System.out.println("AI：" + aimsg);
             String[] lines = aimsg.split("\n");
             StringBuilder texts = new StringBuilder();
             for (int i = 0; i < lines.length; i++) {
@@ -219,7 +199,7 @@ public class ChatAI extends GroupMsgUtils implements FunctionI {
         }
         if (textmsg.matches("\\d{1,2}")) {
             int i = Integer.parseInt(textmsg);
-            if (i==0) return;
+            if (i == 0) return;
             if (!Sp.containsKey(keyId)) return;
             SettingAI sett = new SettingAI(conn, keyId);
             switch (Sp.get(keyId)) {
@@ -233,6 +213,28 @@ public class ChatAI extends GroupMsgUtils implements FunctionI {
             }
         }
 
+    }
+
+    @NotNull
+    private String getReplyMsg(SecPlugin api, Messenger messenger) {
+        String text = "```text\n";
+        if (messenger.hasMsg(Msg.Reply)) {
+            Messenger CacheMsg = api.sendMessenger(msg -> {
+                msg.addMsg(Msg.Account, botUin);
+                msg.addMsg(Msg.Group);
+                msg.addMsg(Msg.GroupId, groupid);
+                msg.addMsg(Msg.GroupMsgCacheGet, messenger.getString(Msg.Reply));
+            });
+            imgList.addAll(CacheMsg.getList(Msg.Url));
+            if (CacheMsg.hasMsg(Msg.Text)){
+                text += CacheMsg.getString(Msg.Text) + "\n```\n";
+            }else {
+                text="";
+            }
+        }else {
+            text="";
+        }
+        return text;
     }
 
 

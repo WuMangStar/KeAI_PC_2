@@ -29,8 +29,8 @@ public class ChatAI extends AuthMsgUtils implements FunctionI {
     public void init(SecPlugin api, Messenger messenger, Connection conn) throws Exception {
         QQBotInit(api, messenger);
         final int CHAT_MOD_FLAG = 1;
-        final String[] CHAT_MOD = {"gpt-4o", "gpt-4o-mini", "claude", "claude-3-5-sonnet"};
-        final String[] CHAT_MOD_EN = {"ChatGPT 4o", "ChatGPT 4o mini", "Claude 3 haiku", "Claude 3.5 sonnet"};
+        final String[] CHAT_MOD = {"gpt-4o", "gpt-4o-mini", "claude", "claude-3-5-sonnet","deepseek-r1"};
+        final String[] CHAT_MOD_EN = {"ChatGPT 4o", "ChatGPT 4o mini", "Claude 3 haiku", "Claude 3.5 sonnet","DeepSeek R1"};
         final String keyId = Sp.containsKey(uin) ? uin : groupid;
         switch (textmsg) {
             case "记忆":

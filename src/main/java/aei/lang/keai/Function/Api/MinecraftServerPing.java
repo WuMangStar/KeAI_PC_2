@@ -31,7 +31,7 @@ public class MinecraftServerPing {
         ByteArrayOutputStream handshake = new ByteArrayOutputStream();
         DataOutputStream handshakeData = new DataOutputStream(handshake);
         handshakeData.writeByte(0x00); // 握手包ID
-        writeVarInt(handshakeData, 767); // 协议版本（763用于MC 1.20.1）
+        writeVarInt(handshakeData, 763); // 协议版本（763用于MC 1.20.1）
         writeString(handshakeData, serverAddress, StandardCharsets.UTF_8); // 服务器地址
         handshakeData.writeShort(port); // 服务器端口
         writeVarInt(handshakeData, 1); // 下一个状态（1表示状态）

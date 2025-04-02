@@ -31,6 +31,7 @@ public class MCRank {
     private int onlineMax;
     private int online;
 
+    int i = 0; //服务器故障计数器
     public MCRank(Connection conn, SecPlugin plugin) {
         this.conn = conn;
         ScheduledExecutorService service = Executors
@@ -38,7 +39,7 @@ public class MCRank {
         Set<String> setB = new HashSet<>();
         service.scheduleAtFixedRate(() -> {
             try {
-                MinecraftServerPing ping = new MinecraftServerPing("jsmsp.fun", 25565);
+                MinecraftServerPing ping = new MinecraftServerPing("s6.yzrilyzr.top", 25565);
                 String status = ping.getServerStatus();
                 JSONObject statusJson = JSON.parseObject(status.substring(status.indexOf("{")));
                 JSONObject players = statusJson.getJSONObject("players");
@@ -83,10 +84,45 @@ public class MCRank {
                 }
                 setB.clear();
                 setB.addAll(setA);
+                i=0;
             } catch (Exception e) {
+                i++;
+                if (i ==36){
+                    try {
+                    StringBuilder errMsg = new StringBuilder();
+                    for (String player : onlineTime.keySet()) {
+                        String playerName = JSON.parseObject(player).getString("name");
+                        long onlineEnd = (System.currentTimeMillis() - onlineTime.get(playerName));
+                        errMsg.append("\n").append(playerName).append(" 退出服务器 在线：").append(msToTime(onlineEnd));
+                        addTime(playerName, onlineEnd);
+                        onlineTime.remove(playerName);
+                    }
+                    if (!errMsg.isEmpty()) {
+                        plugin.sendMessenger(msg -> {
+                            msg.addMsg(Msg.Account, "3153208536");
+                            msg.addMsg(Msg.Group);
+                            msg.addMsg(Msg.GroupId, "465267302");
+                            msg.addMsg(Msg.Text, online + "/" + onlineMax);
+                            msg.addMsg(Msg.Text, errMsg);
+                            //懒得拓展，写死了
+                        });
+                    }
+                    plugin.sendMessenger(msg -> {
+                        msg.addMsg(Msg.Account, "3153208536");
+                        msg.addMsg(Msg.Group);
+                        msg.addMsg(Msg.GroupId, "465267302");
+                        msg.addMsg(Msg.AtUin,1935515130);
+                        msg.addMsg(Msg.AtName,"神");
+                        msg.addMsg(Msg.Text, " 服务器可能存在问题，请检查");
+                    });
+                        save();
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
                 System.out.println("无法链接到服务器");
             }
-        }, 0, 2000, TimeUnit.MILLISECONDS);
+        }, 0, 5000, TimeUnit.MILLISECONDS);
     }
 
     public String ping() {

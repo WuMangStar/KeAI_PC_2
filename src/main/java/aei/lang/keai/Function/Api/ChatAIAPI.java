@@ -28,19 +28,17 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class ChatAIAPI {
-    private final String version = "ChatOn_Android/1.58.504";
+    private final String version = "ChatOn_Android/1.66.536";
 
     //
     public String be() {
-        return "dzlqVkZVWkxuQlFRMWpYUA==";
+        return "V0xHREtEZDMzZGFCUGx3cg==";
     }
 
     public String af(String Act, String url, String time, String json) throws InvalidKeyException, NoSuchAlgorithmException {
-        // byte[] key = {14, 94, 79, 102, 38, -11, 11, 65, 100, 43, 115, 94, 15, -15, 14, 16, 66, -127, -8, -30, 98, 109, -21, 60, 62, 41, 78, 29, 72, -75, 47, 8};
-        byte[] key = {118, 57, 109, 118, 121, 73, 83, 76, 115, 105, 74, 51, 113, 84, 81, 85, 119, 121, 48, 121, 102, 101, 79, 69, 65, 100, 49, 69, 83, 72, 84, 77};
-        byte[] value = (Act + ":" + url + ":" + time + "\n" + json).getBytes(Charsets.UTF_8);
-        Mac mac;
-        mac = Mac.getInstance("HmacSHA256");
+      byte[] key ="sEvP75KGUUlCnR6i5hbashrZr5lowzTB".getBytes();
+        byte[] value = ( Act+ ":" + url +":" + time+ "\n" + json).getBytes(Charsets.UTF_8);
+        Mac mac = Mac.getInstance("HmacSHA256");
         mac.init(new SecretKeySpec(key, mac.getAlgorithm()));
         byte[] doFinal = mac.doFinal(value);
         return Base64.getEncoder().encodeToString(doFinal);
@@ -99,6 +97,7 @@ public class ChatAIAPI {
         mess.setTips(sett.getTips());
 
         JSONObject json = new JSONObject();
+        json.put("function_code_interpreter", true);
         json.put("function_image_gen", true);
         json.put("function_web_search", true);
         json.put("max_tokens", 8000);
@@ -132,11 +131,13 @@ public class ChatAIAPI {
                 .build();
 
         StringBuilder ReplyMessages = new StringBuilder();
+        StringBuilder ThinkMessages = new StringBuilder();
         StringBuilder WebMessages = new StringBuilder();
         CountDownLatch eventLatch = new CountDownLatch(1);
         RealEventSource realEventSource = new RealEventSource(request, new EventSourceListener() {
             @Override
             public void onEvent(@NotNull EventSource eventSource, @Nullable String id, @Nullable String type, @NotNull String data) {
+                super.onEvent(eventSource, id, type, data);
                 super.onEvent(eventSource, id, type, data);
                 JSONObject dataJSON = JSON.parseObject(data);
                 if (dataJSON.containsKey("choices")) {
@@ -147,14 +148,19 @@ public class ChatAIAPI {
                         eventLatch.countDown();
                     }
                     JSONObject delta = choices.getJSONObject("delta");
+                    if (delta.containsKey("reasoning_content")){
+                        ThinkMessages.append(delta.getString("reasoning_content"));
+                        return;
+                    }
                     if (delta.containsKey("content")) {
                         ReplyMessages.append(delta.getString("content"));
+                        return;
                     }
                 } else if (dataJSON.containsKey("data")) {
                     JSONObject dataObj = dataJSON.getJSONObject("data");
                     if (dataObj.containsKey("web")) {
                         JSONObject web = dataObj.getJSONObject("web");
-                        /*if (web.containsKey("sources")) {
+                        if (web.containsKey("sources")) {
                             JSONArray sources = web.getJSONArray("sources");
                             WebMessages.append("\n\n").append("参考：");
                             for (Object urlSources : sources) {
@@ -162,7 +168,7 @@ public class ChatAIAPI {
                                 String url = ((JSONObject) urlSources).getString("url");
                                 WebMessages.append("\n").append(title).append(":").append(url);
                             }
-                        }*/
+                        }
                     }
                 }
             }
@@ -170,7 +176,11 @@ public class ChatAIAPI {
         realEventSource.connect(okHttpClient);
         eventLatch.await();
         mess.setAI(ReplyMessages.toString());
-        return ReplyMessages.toString() + WebMessages;
+        if (!ThinkMessages.isEmpty()){
+            ThinkMessages.insert(0,"```think\n");
+            ThinkMessages.append("\n```");
+        }
+        return ThinkMessages+ReplyMessages.toString() + WebMessages;
     }
 
     public String easyGPT(String text, String model) throws InterruptedException, NoSuchAlgorithmException, InvalidKeyException {

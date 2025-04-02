@@ -43,13 +43,17 @@ public class MineCraft extends GroupMsgUtils implements FunctionI {
                 send("手动记录完成");
                 return;
         }
-        if (textmsg.matches("ping ([a-zA-Z0-9]+\\.)+[a-zA-Z0-9]{1,5}")) {
+        if (textmsg.matches("ping ([a-zA-Z0-9]+\\.)+[a-zA-Z0-9]{1,5}:?\\d{0,5}")) {
             String text = textmsg.substring(4).trim();
             if (!text.isEmpty()){
-                MinecraftServerPing ping = new MinecraftServerPing(text, 25565);
+                int port=25565;
+                if (text.contains(":")){
+                    port = Integer.parseInt(text.substring(text.indexOf(":")+1));
+                    text=text.substring(0,text.indexOf(":"));
+                }
+                MinecraftServerPing ping = new MinecraftServerPing(text,port );
                 String status = ping.getServerStatus();
                 JSONObject statusJson = JSON.parseObject(status.substring(status.indexOf("{")));
-                System.out.println(statusJson);
                 JSONObject players = statusJson.getJSONObject("players");
                 int onlineMax = players.getIntValue("max");
                 int online = players.getIntValue("online");

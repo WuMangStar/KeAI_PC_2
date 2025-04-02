@@ -7,6 +7,10 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 public class GroupMsgUtils {
@@ -29,7 +33,7 @@ public class GroupMsgUtils {
     protected void QQBotInit(SecPlugin api, Messenger messenger) {
         this.api = api;
 
-        textmsg =messenger.getString(Msg.Text);
+        textmsg = messenger.getString(Msg.Text);
         groupid = messenger.getString(Msg.GroupId);
         uinName = messenger.getString(Msg.UinName);
         atName = messenger.getString(Msg.AtName);
@@ -40,16 +44,19 @@ public class GroupMsgUtils {
         imgList = messenger.getList(Msg.Url);
         atUinList = messenger.getList(Msg.AtUin);
         atNameList = messenger.getList(Msg.AtName);
-        textList=messenger.getList(Msg.Text);
+        textList = messenger.getList(Msg.Text);
     }
 
+
     protected void send(String text) {
-       Messenger msgGroup=api.sendMessenger(msg -> {
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");
+        Messenger msgGroup = api.sendMessenger(msg -> {
             msg.addMsg(Msg.Account, botUin);
             msg.addMsg(Msg.Group);
             msg.addMsg(Msg.GroupId, groupid);
             msg.addMsg(Msg.Reply, msgid);
-            msg.addMsg(Msg.Text, text);
+            msg.addMsg(Msg.Text, text+"\n\n✨"+ formatter.format(date));
             if (text.length() > 500) {
                 msg.addMsg(Msg.MultiMsgPut);
                 msg.addMsg(Msg.Uin, uin);
@@ -73,7 +80,7 @@ public class GroupMsgUtils {
                     msg.addMsg(Msg.Xml, "<msg serviceID=\"35\" templateID=\"1\" action=\"viewMultiMsg\" brief=\"KeAI 折叠消息\" m_resid=\"", rsp.getString(Msg.Id), "\" m_fileName=\"", rsp.getString(Msg.Name), "\" tSum=\"2\" sourceMsgId=\"0\" url=\"\" flag=\"3\" adverSign=\"0\" multiMsgFlag=\"0\">");
                     msg.addMsg(Msg.Xml, "<item layout=\"1\" advertiser_id=\"0\" aid=\"0\">");
                     msg.addMsg(Msg.Xml, "<title size=\"34\" maxLines=\"2\" lineSpace=\"12\">@" + uinName + " 请点进查看</title>");
-                    msg.addMsg(Msg.Xml, "<title size=\"26\" color=\"#FF6151\" maxLines=\"2\" lineSpace=\"12\">"+text.split("\n")[0]+"</title>");
+                    msg.addMsg(Msg.Xml, "<title size=\"26\" color=\"#FF6151\" maxLines=\"2\" lineSpace=\"12\">" + text.split("\n")[0] + "</title>");
                     msg.addMsg(Msg.Xml, "<hr hidden=\"false\" style=\"0\" />");
                     msg.addMsg(Msg.Xml, "<summary size=\"26\" color=\"#1F9389\">KeAI 折叠消息</summary>");
                     msg.addMsg(Msg.Xml, "</item>");
@@ -92,12 +99,13 @@ public class GroupMsgUtils {
         }
         return false;
     }
+
     protected String textNoAt() {
         StringBuilder text = new StringBuilder();
         for (String txt : textList) {
             boolean flag = true;
             for (String atN : atNameList) {
-                if (txt.equals("@"+atN)) {
+                if (txt.equals("@" + atN)) {
                     flag = false;
                     break;
                 }
@@ -110,7 +118,7 @@ public class GroupMsgUtils {
     }
 
 
-    public void sendImg( String url) {
+    public void sendImg(String url) {
         api.sendMessenger(msg -> {
             msg.addMsg(Msg.Account, botUin);
             msg.addMsg(Msg.Group);
